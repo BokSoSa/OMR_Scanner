@@ -2,8 +2,8 @@
 #include "Pixel.h"
 #include "Edge.h"
 #include "ImageAnalysis.h"
-
 using namespace cv;
+using namespace std;
 
 int main() {
 	// 카메라 불러오기
@@ -13,48 +13,42 @@ int main() {
 
 	CEdge cedge = CEdge();
 	CImageAnalysis cimageAnalysis = CImageAnalysis();
+	Mat src_img;
+	CImageAnalysis ci = CImageAnalysis();
+	Mat template_img = imread("template.png");
+	Mat screenshot;
 
-
-	Mat cam;
 	while (1) {		// 계속해서 입력되는 웹캠 출력
-		cap >> cam;
-		rectangle(cam, Point(40, 100), Point(600, 350), Scalar(0, 255, 0), 3, 1, 0);
-		imshow("cam", cam);
+		cap >> src_img;
+		rectangle(src_img, Point(40, 100), cv::Point(600, 330), cv::Scalar(0, 255, 0), 3, 1, 0);
+		//imshow("image1", src_img);
 
-		Mat grayOMR;
-		cvtColor(cam, grayOMR, COLOR_BGR2GRAY);
-		Mat edgeDetect = cedge.GS_canny_edge_Canny(grayOMR, 10, 40);
+		Point temp_point;
+		Mat result = ci.GS_templateMatching(src_img, template_img, temp_point);
+		imshow("image2", result);
 
-		imshow("camera", edgeDetect);								// 결과 출력
-
-
-		//Mat line = cimageAnalysis.GS_basicHoughTransformGray(grayOMR);
-		//imshow("line", line);
+		if ((temp_point.x >= 40 && temp_point.x <= 45) && (temp_point.y >= 100 && temp_point.y <= 105)) {
+			cout << temp_point << endl;
+			for (int i = 0; i < 3; i++) {
+				putText(result, to_string(i + 1), Point(250 + 50 * i, 50), 0, 2, Scalar(0, 255, 0), 5);
+				cout << "COUNT :: " << i + 1 << endl;
+				imshow("image2", result);
+				waitKey(1000);
+			}
+			screenshot = src_img;
+			break;
+		}
 
 		if (waitKey(1) == 27) break;	// ESC 입력되면 종료
 	}
-	Mat cutImage = cam(Range(50, 300), Range(20, 450));
-	imshow("cut", cutImage);
-	//Mat colorOMR = cam;
-	//imshow("colorOMR", colorOMR);
-	//waitKey();
+	screenshot = screenshot(Range(100, 330), Range(40, 600));
+	imshow("image3", screenshot);
 
-	//// grayscale로 변환
-	//Mat grayOMR;
-	//cvtColor(colorOMR, grayOMR, COLOR_BGR2GRAY);
-	//imshow("grayOMR", grayOMR);
+	Mat grayOMR;
+	cvtColor(screenshot, grayOMR, COLOR_BGR2GRAY);
+	Mat edgeDetect = cedge.GS_canny_edge_Canny(grayOMR, 10, 40);
 
-	//CEdge cedge = CEdge();
-	////Mat EdgeDetect = cedge.GS_laplacian_edge_Laplacian(grayOMR);
-	//Mat binary = cedge.GS_canny_edge_Canny(grayOMR, 10, 40);
+	imshow("image4", edgeDetect);								// 결과 출력
 
-	////imshow("edge", EdgeDetect);
-	//imshow("binary", binary);
-
-	/*CImageAnalysis cimageAnalysis = CImageAnalysis();
-	Mat line = cimageAnalysis.GS_basicHoughTransformGray(EdgeDetect);
-	imshow("line", line);*/
-
-	// 아무 키나 입력될 때까지 wait
 	waitKey();
 }

@@ -472,7 +472,7 @@ cv::Mat CImageAnalysis::GS_probHoughTransform(cv::Mat src_image)
 
 // ÅÛÇÃ¸´ ¸ÅÄª(template matching)
 // http://www-cv.mech.eng.osaka-u.ac.jp/~hamada/openCV/src/sample15.cc
-cv::Mat CImageAnalysis::GS_templateMatching(cv::Mat src_image, cv::Mat template_image)
+cv::Mat CImageAnalysis::GS_templateMatching(cv::Mat src_image, cv::Mat template_image, cv::Point& min_loc)
 {
 	CUtil util;
 
@@ -496,7 +496,7 @@ cv::Mat CImageAnalysis::GS_templateMatching(cv::Mat src_image, cv::Mat template_
 	cv::matchTemplate(src_image, template_image, matching_image, cv::TM_SQDIFF);
 
 	double  min_val, max_val;
-	cv::Point min_loc, max_loc;
+	cv::Point max_loc;
 
 	cv::minMaxLoc(matching_image, &min_val, &max_val, &min_loc, &max_loc, cv::Mat());
 	

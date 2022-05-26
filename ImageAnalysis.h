@@ -88,7 +88,7 @@ public:
 	//-------------
 	
 	// ÅÛÇÃ¸´ ¸ÅÄª
-	cv::Mat GS_templateMatching(cv::Mat src_image, cv::Mat template_image);
+	cv::Mat GS_templateMatching(cv::Mat src_image, cv::Mat template_image, cv::Point& min_loc);
 };
 
 #endif // !defined(AFX_IMAGEANALYSIS_H__02575BF0_7F7D_4A12_8B40_3BCC13F6AE05__INCLUDED_)
