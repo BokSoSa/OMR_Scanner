@@ -7,7 +7,7 @@
 
 using namespace cv;
 using namespace std;
-int remove_shadow() {
+void remove_shadow() {
 
 	Mat testImage = imread("resource/testimage/omr1_marking.jpg");
 
