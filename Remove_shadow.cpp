@@ -8,16 +8,13 @@
 using namespace cv;
 using namespace std;
 
-Mat remove_shadow(string imgLocate) {
+Mat remove_shadow(Mat img) {
 	CEdge c; CPixel cp; CFilter cf;	CColor cc;
-	
-	Mat testImage = imread(imgLocate);
-	resize(testImage, testImage, Size(testImage.cols / 4, testImage.rows / 4));
 
 	Mat splits[3];
 	Mat outputSplits[3];
 	Mat dilatedImage;
-	split(testImage, splits);
+	split(img, splits);
 
 	for (int i = 0; i < 3; i++) {
 		dilate(splits[i], outputSplits[i], getStructuringElement(MORPH_ELLIPSE, Size(7, 7)));
@@ -26,7 +23,7 @@ Mat remove_shadow(string imgLocate) {
 
 		normalize(outputSplits[i], outputSplits[i], 0, 255, NORM_MINMAX);
 	}
-	testImage = cc.GS_compositeRGB(outputSplits);
+	img = cc.GS_compositeRGB(outputSplits);
 
-	return testImage;
+	return img;
 }

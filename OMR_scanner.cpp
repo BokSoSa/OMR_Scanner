@@ -6,11 +6,18 @@
 using namespace cv;
 using namespace std;
 
-Mat remove_shadow(string imgLocate);
+Mat remove_shadow(Mat img);
+void mouseClick(Mat img);
+Mat get_cropped();
 
 int main() {
-	Mat img = remove_shadow("resource/testimage/omr2_marking1.jpg");
-	imshow("img", img);
+	Mat omrImg = imread("resource/testimage/omr2_marking1.jpg");
+	resize(omrImg, omrImg, Size(omrImg.cols / 4, omrImg.rows / 4));
+	omrImg = remove_shadow(omrImg);
+
+	mouseClick(omrImg);
+	//Mat crop = get_cropped();
+	
 	waitKey();
 
 	// 카메라 불러오기
