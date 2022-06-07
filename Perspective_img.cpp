@@ -6,7 +6,6 @@ using namespace std;
 Mat perspective_img(Mat img);
 void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat);
 
-
 struct locate {
 	int x;
 	int y;
@@ -15,12 +14,7 @@ struct locate {
 locate xy[4];
 int loc_idx = 0;
 Mat omrImg;
-Mat crop;
 
-Mat get_cropped() {
-	imshow("crop", crop);
-	return crop;
-}
 
 void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 	if (event == EVENT_LBUTTONDOWN) {
@@ -29,8 +23,9 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 		loc_idx++;
 	}
 	if (loc_idx == 4) {
-		crop = perspective_img(omrImg);
-		get_cropped();
+		Mat crop = perspective_img(omrImg);
+
+		imshow("cropped", crop);
 		findAnswers(crop, 330, 350, 11, 22, 0.5);
 		return;
 	}
@@ -62,14 +57,14 @@ Mat perspective_img(Mat img) {
 	inputQuad[3] = Point2f(xy[3].x, xy[3].y); // 왼쪽아래
 	// 맵핑될 이미지를 시계방향으로 잡아준다.
 	outputQuad[0] = Point2f(0, 0);
-	outputQuad[1] = Point2f(img.cols - 1, 0);
-	outputQuad[2] = Point2f(img.cols - 1, img.rows - 1);
-	outputQuad[3] = Point2f(0, img.rows - 1);
+	outputQuad[1] = Point2f((xy[1].x - xy[0].x)*2, 0);
+	outputQuad[2] = Point2f((xy[1].x - xy[0].x) * 2, (xy[2].y - xy[1].y) * 2);
+	outputQuad[3] = Point2f(0, (xy[2].y - xy[1].y) * 2);
 
 	// 입력,출력 Quad를 통해 getPerspectiveTransform함수를 이용하여 변환행렬을 구함
 	lambda = getPerspectiveTransform(inputQuad, outputQuad);
 	// 이미지 와핑
-	warpPerspective(img, output, lambda, output.size());//입력,출력,변환행렬,크기
+	warpPerspective(img, output, lambda, Size((xy[1].x - xy[0].x) * 2, (xy[2].y - xy[1].y) * 2));//입력,출력,변환행렬,크기
 
 	return output;
 }
