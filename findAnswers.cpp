@@ -10,7 +10,7 @@
 using namespace cv;
 using namespace std;
 
-void findAnswers(string imgName, int imgW, int imgH, int ansW, int ansH, double rat) {
+void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat) {
     // 채점용 답안 정보
     const int NoOfChoice = 5;
     const int NoOfQuestion = 5;
@@ -25,7 +25,7 @@ void findAnswers(string imgName, int imgW, int imgH, int ansW, int ansH, double 
     // 이미지 불러오고 엣지 찾기 (Canny)
     Mat image, gray, blurred, edge;
 
-    image = imread(imgName, IMREAD_COLOR);
+    image = img;
     resize(image, image, Size(imgW, imgH));
 
     if (image.empty()) {
@@ -47,7 +47,7 @@ void findAnswers(string imgName, int imgW, int imgH, int ansW, int ansH, double 
     //imshow("thresh", thresh);
 
     findContours(thresh, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE, Point(0, 0));
-    cout << "이미지 불러오기 : " << imgName << '\n';
+    //cout << "이미지 불러오기 : " << imgName << '\n';
     cout << "이미지 이진화" << '\n';
 
     // 답안 영역 추출
@@ -102,13 +102,4 @@ void findAnswers(string imgName, int imgW, int imgH, int ansW, int ansH, double 
         cout << "Question: " << i / NoOfChoice << " Tester's Answer: " << answerKey + 1 << "\n";
     }
     cout << "답 출력 완료" << '\n';
-}
-
-int main() 
-{
-	// string imgName, int imgW, int imgH, int ansW, int ansH, double rat
-	findAnswers("t1.jpg", 330, 350, 11, 22, 0.5);
-	findAnswers("test05.jpg", 330, 350, 11, 22, 0.5);
-	//findAnswers("t3.jpg", 330, 350, 11, 22, 0.5);
-	//findAnswers("t4.jpg", 330, 350, 11, 22, 0.5);
 }

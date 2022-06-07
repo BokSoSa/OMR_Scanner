@@ -4,6 +4,8 @@ using namespace cv;
 using namespace std;
 
 Mat perspective_img(Mat img);
+void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat);
+
 
 struct locate {
 	int x;
@@ -29,6 +31,7 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 	if (loc_idx == 4) {
 		crop = perspective_img(omrImg);
 		get_cropped();
+		findAnswers(crop, 330, 350, 11, 22, 0.5);
 		return;
 	}
 }
