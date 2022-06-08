@@ -5,7 +5,7 @@ using namespace std;
 
 Mat perspective_img(Mat img);
 void findAnswers(Mat img, int ansW, int ansH, double rat);
-void templateMatch(Mat img, Mat tImg, double threshold);
+vector<Point> templateMatch(Mat img, Mat tImg, double threshold);
 
 struct locate {
 	int x;
@@ -31,15 +31,18 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 		cout << "crop.cols / crop.rows: " << ratio << '\n';
 
 		Mat tempMarking = imread("resource/templateImage/template0.png");
-		//Mat tempCircle = imread("resource/templateImage/template2.png");
+		Mat tempCircle = imread("resource/templateImage/template2.png");
 		if ((ratio > 0.8) && (ratio < 1)) { // 1~5¹øÀÏ ¶§
 			resize(tempMarking, tempMarking, Size(crop.rows * 0.049, crop.rows * 0.089));
+			resize(tempCircle, tempCircle, Size(crop.rows * 0.049, crop.rows * 0.089));
 		}
 		else {
 			resize(tempMarking, tempMarking, Size(crop.rows * 0.028, crop.rows * 0.05));
+			resize(tempCircle, tempCircle, Size(crop.rows * 0.028, crop.rows * 0.05));
 		}
 
-		templateMatch(crop, tempMarking, 0.15);
+		//templateMatch(crop, tempMarking, 0.15);
+		templateMatch(crop, tempCircle, 0.5);
 		return;
 	}
 }

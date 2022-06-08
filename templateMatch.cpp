@@ -4,11 +4,11 @@
 #include "Color.h"
 #include "Filter.h"
 #include "ImageAnalysis.h"
-
+#include <vector>
 using namespace cv;
 using namespace std;
 
-void templateMatch(Mat img, Mat tImg, double threshold) {
+vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
 	imshow("init",img);
 
 	CImageAnalysis ci = CImageAnalysis();
@@ -20,14 +20,32 @@ void templateMatch(Mat img, Mat tImg, double threshold) {
 	int count = 0;
 	Mat dstImg = img.clone();
 
+	vector<Point> templateMatchedPoints;
+	
+
 	matchTemplate(dstImg, templateImg, result, TM_SQDIFF_NORMED);
 	minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
 
 	for (int i = 0; i < result.rows; i++) {
 		for (int j = 0; j < result.cols; j++) {
 			if (result.at<float>(i, j) < threshold) {
-				rectangle(dstImg, Point(j, i), Point(j + templateImg.cols, i + templateImg.rows), Scalar(0, 0, 255), 1);
-				count++;
+				// 중복 체크
+				bool isOverlapped = false;
+
+				for(int k=0; k< templateMatchedPoints.size(); k++){
+					if (j >= templateMatchedPoints[k].x - templateImg.cols
+						&& j <= templateMatchedPoints[k].x + templateImg.cols
+						&& i >= templateMatchedPoints[k].y - templateImg.rows
+						&& i <= templateMatchedPoints[k].y + templateImg.rows) {
+						isOverlapped = true;
+						break;
+					}
+				}
+				if (!isOverlapped) {
+					templateMatchedPoints.push_back(Point(j, i));
+					rectangle(dstImg, Point(j, i), Point(j + templateImg.cols, i + templateImg.rows), Scalar(0, 0, 255), 1);
+					count++;
+				}
 			}
 		}
 	}
@@ -39,4 +57,5 @@ void templateMatch(Mat img, Mat tImg, double threshold) {
 	imshow("final", dstImg);
 
 	waitKey(0);
+	return templateMatchedPoints;
 }
