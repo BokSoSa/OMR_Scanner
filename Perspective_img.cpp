@@ -27,17 +27,19 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 		Mat crop = perspective_img(omrImg);
 
 		imshow("cropped", crop);
+		double ratio = double(crop.cols) / double(crop.rows); // crop 이미지 가로세로 비율
+		cout << "crop.cols / crop.rows: " << ratio << '\n';
 
 		Mat tempMarking = imread("resource/templateImage/template0.png");
-		Mat tempCircle = imread("resource/templateImage/template2.png");
-		double r = 1.5; // imshow 크기 조절용
-		resize(crop, crop, Size(383 * r, 356 * r));
-		resize(tempMarking, tempMarking, Size(10 * r, 18 * r));
-		//resize(tempCircle, tempCircle, Size(10 * r, 18 * r));
-		templateMatch(crop, tempMarking, 0.2);
-		//templateMatch(crop, tempCircle, 0.5);
-		 
-		//findAnswers(crop, 11, 22, 0.5);
+		//Mat tempCircle = imread("resource/templateImage/template2.png");
+		if ((ratio > 0.8) && (ratio < 1)) { // 1~5번일 때
+			resize(tempMarking, tempMarking, Size(crop.rows * 0.049, crop.rows * 0.089));
+		}
+		else {
+			resize(tempMarking, tempMarking, Size(crop.rows * 0.028, crop.rows * 0.05));
+		}
+
+		templateMatch(crop, tempMarking, 0.15);
 		return;
 	}
 }

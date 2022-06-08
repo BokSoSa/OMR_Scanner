@@ -35,7 +35,7 @@ void templateMatch(Mat img, Mat tImg, double threshold) {
 	cout << "maxVal: " << maxVal << ", maxLoc: " << maxLoc << '\n';
 	cout << "Found: " << count << '\n';
 
-	imshow("result", result);
+	//imshow("result", result);
 	imshow("final", dstImg);
 
 	waitKey(0);
