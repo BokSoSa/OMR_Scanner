@@ -56,6 +56,5 @@ vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
 	//imshow("result", result);
 	imshow("final", dstImg);
 
-	waitKey(0);
 	return templateMatchedPoints;
 }

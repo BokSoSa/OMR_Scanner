@@ -159,6 +159,7 @@
     <ClCompile Include="Perspective_img.cpp" />
     <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="Remove_shadow.cpp" />
+    <ClCompile Include="SortUserAnswer.cpp" />
     <ClCompile Include="templateMatch.cpp" />
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="ImageAnalysis.h" />
     <ClInclude Include="Morph.h" />
     <ClInclude Include="Pixel.h" />
+    <ClInclude Include="SortUserAnswer.h" />
     <ClInclude Include="transform.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>

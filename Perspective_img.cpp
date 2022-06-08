@@ -1,11 +1,12 @@
 #include <opencv2/opencv.hpp>
-
+#include "SortUserAnswer.h"
 using namespace cv;
 using namespace std;
 
 Mat perspective_img(Mat img);
 void findAnswers(Mat img, int ansW, int ansH, double rat);
 vector<Point> templateMatch(Mat img, Mat tImg, double threshold);
+
 
 struct locate {
 	int x;
@@ -41,8 +42,17 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 			resize(tempCircle, tempCircle, Size(crop.rows * 0.028, crop.rows * 0.05));
 		}
 
-		//templateMatch(crop, tempMarking, 0.15);
-		templateMatch(crop, tempCircle, 0.5);
+		vector<Point> checkedAnswer = templateMatch(crop, tempMarking, 0.15);
+		vector<Point> uncheckedAnswer = templateMatch(crop, tempCircle, 0.5);
+		cout << "???: " << checkedAnswer.size() << endl;
+		vector<AnswerByChecked> answers = mergeCheckedAnswer(checkedAnswer, uncheckedAnswer);
+		answers = sortAnswerByPoint(answers, tempMarking.cols, tempMarking.rows);
+		
+		/*for (int i = 0; i < answers.size(); i++) {
+			cout << i + 1 << " ";
+			cout << answers[i].getAnswerPoint().x << ", " << answers[i].getAnswerPoint().y << " : " << answers[i].isChecked()<<endl;
+		}*/
+
 		return;
 	}
 }
