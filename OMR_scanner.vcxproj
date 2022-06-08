@@ -148,6 +148,7 @@
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="findAnswers.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="ImageAnalysis.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="Perspective_img.cpp" />
     <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="Remove_shadow.cpp" />
+    <ClCompile Include="templateMatch.cpp" />
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>

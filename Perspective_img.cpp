@@ -4,7 +4,8 @@ using namespace cv;
 using namespace std;
 
 Mat perspective_img(Mat img);
-void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat);
+void findAnswers(Mat img, int ansW, int ansH, double rat);
+void templateMatch(Mat img, Mat tImg, double threshold);
 
 struct locate {
 	int x;
@@ -26,7 +27,8 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 		Mat crop = perspective_img(omrImg);
 
 		imshow("cropped", crop);
-		findAnswers(crop, 330, 350, 11, 22, 0.5);
+		//templateMatch(crop);
+		//findAnswers(crop, 11, 22, 0.5);
 		return;
 	}
 }

@@ -10,7 +10,7 @@
 using namespace cv;
 using namespace std;
 
-void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat) {
+void findAnswers(Mat img, int ansW, int ansH, double rat) {
     // 채점용 답안 정보
     const int NoOfChoice = 5;
     const int NoOfQuestion = 5;
@@ -22,29 +22,23 @@ void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat) {
     standardAnswer.insert(make_pair(3, 2)); //Question 4: answer: 3
     standardAnswer.insert(make_pair(4, 0)); //Question 5: answer: 1
 
-    // 이미지 불러오고 엣지 찾기 (Canny)
-    Mat image, gray, blurred, edge;
-
+    // 이미지 불러오기
+    Mat image, gray;
     image = img;
-    resize(image, image, Size(imgW, imgH));
 
     if (image.empty()) {
         cout << "Failed to read file\n";
         exit(1);
     }
     cvtColor(image, gray, COLOR_BGR2GRAY);
-    GaussianBlur(gray, blurred, Size(5, 5), 0);
-    Canny(gray, edge, 75, 200);
-    //imshow("blurred", blurred);
-    //imshow("Canny edge", edge);
 
     // 이미지 이진화, 경계선 벡터에 저장
     Mat thresh;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
 
-    threshold(gray, thresh, 150, 255, THRESH_BINARY_INV | THRESH_OTSU);
-    //imshow("thresh", thresh);
+    threshold(gray, thresh, 50, 255, THRESH_BINARY_INV);
+    imshow("thresh", thresh);
 
     findContours(thresh, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE, Point(0, 0));
     //cout << "이미지 불러오기 : " << imgName << '\n';
@@ -52,7 +46,6 @@ void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat) {
 
     // 답안 영역 추출
     vector<vector<Point>> contours_poly(contours.size());
-    vector<Rect> boundRect(contours.size());
     vector<vector<Point>> questionCnt;
 
     for (int i = 0; i < contours.size(); i++)
@@ -65,11 +58,11 @@ void findAnswers(Mat img, int imgW, int imgH, int ansW, int ansH, double rat) {
         if (hierarchy[i][3] == -1)
             if ((w >= ansW && w <= ansW * 2) && (h >= ansH && h <= ansH * 2) && (ar <= rat + 0.2 && ar >= rat - 0.1)) {
                 questionCnt.push_back(contours_poly[i]);
-                //cout << "-> (" << w << ", " << h << ", " << ar << ")\n";
+                cout << "-> (" << w << ", " << h << ", " << ar << ")\n";
             }
-            //else if ((w >= ansW-2 && w <= ansW * 2) && (h >= ansH-2 && h <= ansH * 2) && (ar <= rat + 0.2 && ar >= rat - 0.2)) {
-            //    std::cout << "(" << w << ", " << h << ", " << ar << ")\n";
-            //}
+            else if ((w >= ansW-2 && w <= ansW * 2) && (h >= ansH-2 && h <= ansH * 2) && (ar <= rat + 0.2 && ar >= rat - 0.2)) {
+                cout << "(" << w << ", " << h << ", " << ar << ")\n";
+            }
     }
     cout << "답안영역 추출" << '\n';
 
