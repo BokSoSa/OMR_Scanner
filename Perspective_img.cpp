@@ -29,11 +29,16 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 
 		imshow("cropped", crop);
 		double ratio = double(crop.cols) / double(crop.rows); // crop 이미지 가로세로 비율
-		cout << "crop.cols / crop.rows: " << ratio << '\n';
+		int op = 0;
+		if ((ratio > 0.8) && (ratio < 1)) op = 1;			// 1~5번
+		else if (ratio < 0.8) op = 2;						// 1~10번
+		else if ((ratio > 1.0) && (ratio < 1.5)) op = 3;	// 1~20번
+		else if ((ratio > 1.5) && (ratio < 2.0)) op = 4;	// 1~30번
+		else op = 5;										// 1~40번
 
 		Mat tempMarking = imread("resource/templateImage/template0.png");
 		Mat tempCircle = imread("resource/templateImage/template2.png");
-		if ((ratio > 0.8) && (ratio < 1)) { // 1~5번일 때
+		if (op == 1) { // 1~5번일 때
 			resize(tempMarking, tempMarking, Size(crop.rows * 0.049, crop.rows * 0.089));
 			resize(tempCircle, tempCircle, Size(crop.rows * 0.049, crop.rows * 0.089));
 		}
@@ -44,14 +49,20 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 
 		vector<Point> checkedAnswer = templateMatch(crop, tempMarking, 0.15);
 		vector<Point> uncheckedAnswer = templateMatch(crop, tempCircle, 0.5);
-		cout << "???: " << checkedAnswer.size() << endl;
+		//cout << "???: " << checkedAnswer.size() << endl;
 		vector<AnswerByChecked> answers = mergeCheckedAnswer(checkedAnswer, uncheckedAnswer);
 		answers = sortAnswerByPoint(answers, tempMarking.cols, tempMarking.rows);
 		
-		/*for (int i = 0; i < answers.size(); i++) {
-			cout << i + 1 << " ";
-			cout << answers[i].getAnswerPoint().x << ", " << answers[i].getAnswerPoint().y << " : " << answers[i].isChecked()<<endl;
-		}*/
+		int count = 0;
+		for (int i = 0; i < answers.size(); i++) {
+			//cout << i + 1 << " ";
+			//cout << answers[i].getAnswerPoint().x << ", " << answers[i].getAnswerPoint().y << " : " << answers[i].isChecked()<<endl;
+			//cout << "(" << answers[i].getAnswerPoint().x << "," << answers[i].getAnswerPoint().y << ") = " << answers[i].isChecked() << " / ";
+			count++;
+			if (answers[i].isChecked() == 1)
+				cout << "Tester's Answer: " << count << endl;
+			if (count == 5) count = 0;
+		}
 
 		return;
 	}

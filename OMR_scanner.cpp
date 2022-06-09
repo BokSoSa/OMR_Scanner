@@ -9,7 +9,6 @@ using namespace std;
 Mat remove_shadow(Mat img);
 void mouseClick(Mat img);
 //Mat get_cropped();
-void templateMatch(Mat img, Mat tImg, double threshold);
 
 int main() {
 	Mat omrImg = imread("resource/testimage/omr2_marking1.jpg");

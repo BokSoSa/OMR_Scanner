@@ -22,7 +22,6 @@ vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
 
 	vector<Point> templateMatchedPoints;
 	
-
 	matchTemplate(dstImg, templateImg, result, TM_SQDIFF_NORMED);
 	minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc);
 
@@ -49,8 +48,6 @@ vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
 			}
 		}
 	}
-	cout << "minVal: " << minVal << ", minLoc: " << minLoc << '\n';
-	cout << "maxVal: " << maxVal << ", maxLoc: " << maxLoc << '\n';
 	cout << "Found: " << count << '\n';
 
 	//imshow("result", result);
