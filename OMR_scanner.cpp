@@ -11,7 +11,7 @@ void mouseClick(Mat img);
 //Mat get_cropped();
 
 int main() {
-	Mat omrImg = imread("resource/testimage/omr2_marking1.jpg");
+	Mat omrImg = imread("resource/testimage/omr2_marking1_1.jpg");
 	resize(omrImg, omrImg, Size(omrImg.cols / 4, omrImg.rows / 4));
 	omrImg = remove_shadow(omrImg);
 

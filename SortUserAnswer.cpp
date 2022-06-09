@@ -26,7 +26,12 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 		resize(tempMarking, tempMarking, Size(input.rows * 0.028, input.rows * 0.05));
 		resize(tempCircle, tempCircle, Size(input.rows * 0.028, input.rows * 0.05));
 	}
+	/*cvtColor(tempMarking, tempMarking, COLOR_BGR2GRAY);
+	cvtColor(tempCircle, tempCircle, COLOR_BGR2GRAY);
+	cvtColor(input, input, COLOR_BGR2GRAY);
 
+	threshold(input, input, 30, 255, THRESH_BINARY);
+	imshow("threshhh", input);*/
 	vector<Point> checkedAnswer = templateMatch(input, tempMarking, 0.15);
 	vector<Point> uncheckedAnswer = templateMatch(input, tempCircle, 0.5);
 	//cout << "???: " << checkedAnswer.size() << endl;
@@ -34,10 +39,13 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 	answers = sortAnswerByPoint(answers, tempMarking.cols, tempMarking.rows);
 
 	int** userAnswer = new int* [op];
+	Point** userAnswerPoint = new Point* [op];
 	for (int i = 0; i < op; i++) {
 		userAnswer[i] = new int[10];
+		userAnswerPoint[i] = new Point[10];
 		for (int j = 0; j < 10; j++) {
 			userAnswer[i][j] = 0;
+			userAnswerPoint[i][j] = Point(0,0);
 		}
 	}
 
@@ -47,6 +55,7 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 		checkedNumber++;
 		if (answers[i].isChecked() == 1) {
 			userAnswer[answerY][answerX] = checkedNumber;
+			userAnswerPoint[answerY][answerX] = answers[i].getAnswerPoint();
 		}
 		if (checkedNumber == 5) {
 			checkedNumber = 0;
@@ -58,20 +67,37 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 		}
 
 	}
+
+	Mat result;
+	input.copyTo(result);
+
+	int correctAnswerCount = 0;
+	int maxAnswerCount = 0;
 	for (int i = 0; i < op; i++) {
 		for (int j = 0; j < 10; j++) {
 			cout << i * 10 + j + 1 << "번: " << userAnswer[i][j] << endl;
+			Point drawTL = userAnswerPoint[i][j];
+			if (userAnswer[i][j]==0) continue;
+
+			maxAnswerCount=i*10+j+1;
+			if (userAnswer[i][j] == answer[i * 10 + j]) {
+				correctAnswerCount++;
+				rectangle(result, drawTL, Point(drawTL.x + templateImgCols, drawTL.y + templateImgRows), Scalar(0, 255, 0), 2);
+			}
+			else {
+				rectangle(result, drawTL, Point(drawTL.x + templateImgCols, drawTL.y + templateImgRows), Scalar(0, 0, 255), 2);
+			}
 		}
 	}
-	
+	cout << "MAX: " << maxAnswerCount << " correct: "<<correctAnswerCount << endl;
 	//채점 + 결과 표시
 	//정답이 20개인데 input image가 40번까지 있는 경우 고려해서 작성
 	//틀린 경우 답체크 X 틀림 여부만 체크
 	//답을 체크 안한경우는 답체크X 틀림여부 체크도X
 
 	
-	Mat result;
-
+	
+	imshow("rrrresult", result);
 
 	return result;
 }
