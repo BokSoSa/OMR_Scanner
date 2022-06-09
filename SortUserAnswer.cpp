@@ -64,6 +64,11 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 		}
 	}
 	
+	//채점 + 결과 표시
+	//정답이 20개인데 input image가 40번까지 있는 경우 고려해서 작성
+	//틀린 경우 답체크 X 틀림 여부만 체크
+	//답을 체크 안한경우는 답체크X 틀림여부 체크도X
+
 	
 	Mat result;
 
