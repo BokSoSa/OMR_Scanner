@@ -5,7 +5,7 @@ using namespace std;
 
 Mat perspective_img(Mat img);
 void findAnswers(Mat img, int ansW, int ansH, double rat);
-vector<Point> templateMatch(Mat img, Mat tImg, double threshold);
+Mat checkAnswerBySort(Mat input, int answer[]);
 
 
 struct locate {
@@ -23,49 +23,19 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 		xy[loc_idx].x = x;
 		xy[loc_idx].y = y;
 		loc_idx++;
+		cout << "loc_idx: " << loc_idx << endl;
+		if (loc_idx == 4) {
+
+			Mat crop = perspective_img(omrImg);
+
+			int correctAnswer[40] = { 2,4,3,4,1,2,3,2,1,3,2,4,4,2,1,3,5,3,4,2 };
+
+			imshow("cropped", crop);
+			checkAnswerBySort(crop, correctAnswer);
+		}
 	}
-	if (loc_idx == 4) {
-		Mat crop = perspective_img(omrImg);
-
-		imshow("cropped", crop);
-		double ratio = double(crop.cols) / double(crop.rows); // crop 이미지 가로세로 비율
-		int op = 0;
-		if ((ratio > 0.8) && (ratio < 1)) op = 1;			// 1~5번
-		else if (ratio < 0.8) op = 2;						// 1~10번
-		else if ((ratio > 1.0) && (ratio < 1.5)) op = 3;	// 1~20번
-		else if ((ratio > 1.5) && (ratio < 2.0)) op = 4;	// 1~30번
-		else op = 5;										// 1~40번
-
-		Mat tempMarking = imread("resource/templateImage/template0.png");
-		Mat tempCircle = imread("resource/templateImage/template2.png");
-		if (op == 1) { // 1~5번일 때
-			resize(tempMarking, tempMarking, Size(crop.rows * 0.049, crop.rows * 0.089));
-			resize(tempCircle, tempCircle, Size(crop.rows * 0.049, crop.rows * 0.089));
-		}
-		else {
-			resize(tempMarking, tempMarking, Size(crop.rows * 0.028, crop.rows * 0.05));
-			resize(tempCircle, tempCircle, Size(crop.rows * 0.028, crop.rows * 0.05));
-		}
-
-		vector<Point> checkedAnswer = templateMatch(crop, tempMarking, 0.15);
-		vector<Point> uncheckedAnswer = templateMatch(crop, tempCircle, 0.5);
-		//cout << "???: " << checkedAnswer.size() << endl;
-		vector<AnswerByChecked> answers = mergeCheckedAnswer(checkedAnswer, uncheckedAnswer);
-		answers = sortAnswerByPoint(answers, tempMarking.cols, tempMarking.rows);
-		
-		int count = 0;
-		for (int i = 0; i < answers.size(); i++) {
-			//cout << i + 1 << " ";
-			//cout << answers[i].getAnswerPoint().x << ", " << answers[i].getAnswerPoint().y << " : " << answers[i].isChecked()<<endl;
-			//cout << "(" << answers[i].getAnswerPoint().x << "," << answers[i].getAnswerPoint().y << ") = " << answers[i].isChecked() << " / ";
-			count++;
-			if (answers[i].isChecked() == 1)
-				cout << "Tester's Answer: " << count << endl;
-			if (count == 5) count = 0;
-		}
-
-		return;
-	}
+	
+	return;
 }
 
 void mouseClick(Mat img) {
