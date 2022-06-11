@@ -7,6 +7,49 @@
 int templateImgCols; //오차 범위 계산을 위한 template image의 가로 길이
 int templateImgRows; //오차 범위 계산을 위한 template image의 세로 길이
 vector<Point> templateMatch(Mat img, Mat tImg, double threshold);
+vector<Point> templateMatch(Mat img, vector<Mat> tImg, double threshold);
+
+
+Mat checkAnswerByNumberTemplate(Mat input, int answer[]) {
+	double ratio = double(input.cols) / double(input.rows); // crop 이미지 가로세로 비율
+	int op = 0;
+	if ((ratio > 0.8) && (ratio < 1)) op = 1;			// 1~5번	1단
+	else if (ratio < 0.8) op = 1;						// 1~10번	1단
+	else if ((ratio > 1.0) && (ratio < 1.5)) op = 2;	// 1~20번	2단
+	else if ((ratio > 1.5) && (ratio < 2.0)) op = 3;	// 1~30번	3단
+	else op = 4;										// 1~40번	4단
+
+	Mat tempMarking = imread("resource/templateImage/final0.png"); //체크된 이미지
+	if ((ratio > 0.8) && (ratio < 1)) { // 1~5번일 때
+		resize(tempMarking, tempMarking, Size(input.rows * 0.103, input.rows * 0.103));
+	}
+	else {
+		resize(tempMarking, tempMarking, Size(input.rows * 0.059, input.rows * 0.059));
+	}
+	// 체크된 답 좌표들
+	vector<Point> checkedAnswer = templateMatch(input, tempMarking, 0.3);
+	
+	Mat removeAnswer; //체크된 답 지운 이미지 저장할 객체
+	removeAnswer = input.clone();
+	for (int i = 0; i < checkedAnswer.size(); i++) {
+		rectangle(removeAnswer, Point(checkedAnswer[i].x, checkedAnswer[i].y), Point(checkedAnswer[i].x + templateImgCols, checkedAnswer[i].y + templateImgRows), Scalar(0, 0, 0), FILLED);
+	}
+
+	vector<Mat> number;
+	for (int i = 0; i < 40; i++) {
+		string img_path = format("resource/number/%d.png", i + 1);
+		number.push_back(imread(img_path));
+		resize(number.back(), number.back(), Size(input.rows * 0.075, input.rows * 0.075));
+	}
+
+	vector<Point> question = templateMatch(removeAnswer, number, 0.5);
+
+	imshow("removeAns", removeAnswer);
+	return removeAnswer;
+}
+
+
+
 Mat checkAnswerBySort(Mat input, int answer[]) {
 	double ratio = double(input.cols) / double(input.rows); // crop 이미지 가로세로 비율
 	int op = 0;
@@ -18,6 +61,8 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 
 	Mat tempMarking = imread("resource/templateImage/final0.png");
 	Mat tempCircle = imread("resource/templateImage/final4.png");
+
+	
 	if ((ratio > 0.8) && (ratio < 1)) { // 1~5번일 때
 		resize(tempMarking, tempMarking, Size(input.rows * 0.103, input.rows * 0.103));
 		resize(tempCircle, tempCircle, Size(input.rows * 0.103, input.rows * 0.103));

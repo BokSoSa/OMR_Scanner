@@ -36,6 +36,7 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 
 			imshow("cropped", crop);
 			checkAnswerBySort(crop, correctAnswer);
+			checkAnswerByNumberTemplate(crop, correctAnswer);
 		}
 	}
 	
