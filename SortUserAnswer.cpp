@@ -3,21 +3,35 @@
 #include <algorithm>
 #include "SortUserAnswer.h"
 
-
 int templateImgCols; //오차 범위 계산을 위한 template image의 가로 길이
 int templateImgRows; //오차 범위 계산을 위한 template image의 세로 길이
 vector<Point> templateMatch(Mat img, Mat tImg, double threshold);
 vector<Point> templateMatch(Mat img, vector<Mat> tImg, double threshold);
 
-
 Mat checkAnswerByNumberTemplate(Mat input, int answer[]) {
 	double ratio = double(input.cols) / double(input.rows); // crop 이미지 가로세로 비율
 	int op = 0;
-	if ((ratio > 0.8) && (ratio < 1)) op = 1;			// 1~5번	1단
-	else if (ratio < 0.8) op = 1;						// 1~10번	1단
-	else if ((ratio > 1.0) && (ratio < 1.5)) op = 2;	// 1~20번	2단
-	else if ((ratio > 1.5) && (ratio < 2.0)) op = 3;	// 1~30번	3단
-	else op = 4;										// 1~40번	4단
+	int upQuestion = 0;
+	if ((ratio > 0.8) && (ratio < 1)) {					// 1~5번	1단
+		op = 1;
+		upQuestion = 5;
+	}
+	else if (ratio < 0.8) {								// 1~10번	1단
+		op = 1;
+		upQuestion = 5;
+	}
+	else if ((ratio > 1.0) && (ratio < 1.5)) {			// 1~20번	2단
+		op = 2;
+		upQuestion = 10;
+	}
+	else if ((ratio > 1.5) && (ratio < 2.0)) {		 	// 1~30번	3단
+		op = 3;
+		upQuestion = 15;
+	}
+	else {												// 1~40번	4단
+		op = 4;
+		upQuestion = 20;
+	}
 
 	Mat tempMarking = imread("resource/templateImage/final0.png"); //체크된 이미지
 	if ((ratio > 0.8) && (ratio < 1)) { // 1~5번일 때
@@ -44,11 +58,45 @@ Mat checkAnswerByNumberTemplate(Mat input, int answer[]) {
 
 	vector<Point> question = templateMatch(removeAnswer, number, 0.5);
 
-	imshow("removeAns", removeAnswer);
+	templateImgCols = number[0].cols;
+	templateImgRows = number[0].rows;
+
+	int userAnswer[40] = { 0, };
+	
+	sort(question.begin(), question.end(), compareAnswer2);
+	vector<pair<int, Point>> yDupCheck;
+	for (int i = 0; i < checkedAnswer.size(); i++) { // 사용자가 마킹한 답안
+		bool flag = false;
+		for (int j = upQuestion; j < question.size(); j++) { // 마킹된 문제 번호을 제외한 문제 개수
+			if (abs(checkedAnswer[i].y - question[j].y) < templateImgCols) { // 문제 번호와 마킹한 답안의 y좌표의 차이
+				for (int k = 0; k < upQuestion; k++) {
+					if (abs(question[k].x - checkedAnswer[i].x) < templateImgCols) {
+						yDupCheck.push_back(make_pair(k / 5 * 10 + (j - upQuestion) / 4 + 1, checkedAnswer[i]));
+						flag = true;
+						break;
+					}
+				}
+			}
+			if (flag) break;
+		}
+	}
+
+	for (int i = 0; i < yDupCheck.size(); i++) {
+		for (int j = 0; j < upQuestion; j++) {
+			if (abs(yDupCheck[i].second.x - question[j].x) < templateImgRows) {
+				userAnswer[yDupCheck[i].first - 1] = (j % 5) + 1;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < 40; i++) {
+		cout << i + 1 << "번 : " << userAnswer[i] << endl;
+	}
+
+	//imshow("removeAns", removeAnswer);
+
 	return removeAnswer;
 }
-
-
 
 Mat checkAnswerBySort(Mat input, int answer[]) {
 	double ratio = double(input.cols) / double(input.rows); // crop 이미지 가로세로 비율
@@ -173,6 +221,19 @@ bool compareAnswer(AnswerByChecked a, AnswerByChecked b) {
 	if (a.getAnswerPoint().x < b.getAnswerPoint().x - templateImgRows)
 		return true;
 	if (a.getAnswerPoint().x > b.getAnswerPoint().x + templateImgRows)
+		return false;
+	return false;
+}
+
+bool compareAnswer2(Point a, Point b) {
+	//오차범위 포함한 정렬
+	if (a.y < b.y - templateImgCols)
+		return true;
+	if (a.y > b.y + templateImgCols)
+		return false;
+	if (a.x < b.x - templateImgRows)
+		return true;
+	if (a.x > b.x + templateImgRows)
 		return false;
 	return false;
 }
