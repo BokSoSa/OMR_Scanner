@@ -29,7 +29,10 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 
 			Mat crop = perspective_img(omrImg);
 
-			int correctAnswer[40] = { 2,4,3,4,1,2,3,2,1,3,2,4,4,2,1,3,5,3,4,2 };
+			int correctAnswer[40] = { 2,4,3,4,1, 2,3,2,1,3,
+									2,4,4,2,1, 3,5,3,4,2,
+									2,1,1,5,4, 3,2,1,4,5,
+									1,2,1,3,4, 2,3,3,4,5};
 
 			imshow("cropped", crop);
 			checkAnswerBySort(crop, correctAnswer);

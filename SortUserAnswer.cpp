@@ -16,25 +16,20 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 	else if ((ratio > 1.5) && (ratio < 2.0)) op = 3;	// 1~30번	3단
 	else op = 4;										// 1~40번	4단
 
-	Mat tempMarking = imread("resource/templateImage/template0.png");
-	Mat tempCircle = imread("resource/templateImage/template2.png");
+	Mat tempMarking = imread("resource/templateImage/final0.png");
+	Mat tempCircle = imread("resource/templateImage/final4.png");
 	if ((ratio > 0.8) && (ratio < 1)) { // 1~5번일 때
-		resize(tempMarking, tempMarking, Size(input.rows * 0.049, input.rows * 0.089));
-		resize(tempCircle, tempCircle, Size(input.rows * 0.049, input.rows * 0.089));
+		resize(tempMarking, tempMarking, Size(input.rows * 0.103, input.rows * 0.103));
+		resize(tempCircle, tempCircle, Size(input.rows * 0.103, input.rows * 0.103));
 	}
 	else {
-		resize(tempMarking, tempMarking, Size(input.rows * 0.028, input.rows * 0.05));
-		resize(tempCircle, tempCircle, Size(input.rows * 0.028, input.rows * 0.05));
+		resize(tempMarking, tempMarking, Size(input.rows * 0.059, input.rows * 0.059));
+		resize(tempCircle, tempCircle, Size(input.rows * 0.059, input.rows * 0.059));
 	}
-	/*cvtColor(tempMarking, tempMarking, COLOR_BGR2GRAY);
-	cvtColor(tempCircle, tempCircle, COLOR_BGR2GRAY);
-	cvtColor(input, input, COLOR_BGR2GRAY);
 
-	threshold(input, input, 30, 255, THRESH_BINARY);
-	imshow("threshhh", input);*/
-	vector<Point> checkedAnswer = templateMatch(input, tempMarking, 0.15);
-	vector<Point> uncheckedAnswer = templateMatch(input, tempCircle, 0.5);
-	//cout << "???: " << checkedAnswer.size() << endl;
+	vector<Point> checkedAnswer = templateMatch(input, tempMarking, 0.3);
+	vector<Point> uncheckedAnswer = templateMatch(input, tempCircle, 0.55);
+
 	vector<AnswerByChecked> answers = mergeCheckedAnswer(checkedAnswer, uncheckedAnswer);
 	answers = sortAnswerByPoint(answers, tempMarking.cols, tempMarking.rows);
 
@@ -95,7 +90,12 @@ Mat checkAnswerBySort(Mat input, int answer[]) {
 	//틀린 경우 답체크 X 틀림 여부만 체크
 	//답을 체크 안한경우는 답체크X 틀림여부 체크도X
 
-	
+	double score = ((double)correctAnswerCount / maxAnswerCount * 100);
+	putText(result, "SCORE: "+to_string((int)score), Point(30, 30), FONT_HERSHEY_SIMPLEX, 0.9, Scalar(255, 255, 0), 2);
+	cout << "\n**** 채점 결과 ****" << endl;
+	cout << "푼 문제 수: " << maxAnswerCount << endl;
+	cout << "맞은 문제 수: " << correctAnswerCount << endl;
+	cout << "점수: " << (int)score << "점" << endl;
 	
 	imshow("rrrresult", result);
 

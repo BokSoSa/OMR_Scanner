@@ -10,6 +10,7 @@ using namespace std;
 
 vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
 	imshow("init",img);
+	imshow("template", tImg);
 
 	CImageAnalysis ci = CImageAnalysis();
 	Mat templateImg = tImg.clone();
