@@ -9,8 +9,6 @@ using namespace cv;
 using namespace std;
 
 vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
-	imshow("init",img);
-	imshow("template", tImg);
 
 	CImageAnalysis ci = CImageAnalysis();
 	Mat templateImg = tImg.clone();
@@ -52,13 +50,11 @@ vector<Point> templateMatch(Mat img, Mat tImg, double threshold) {
 	cout << "Found: " << count << '\n';
 
 	//imshow("result", result);
-	imshow("final2", dstImg);
 
 	return templateMatchedPoints;
 }
 
 vector<Point> templateMatch(Mat img, vector<Mat> tImg, double threshold) {
-	imshow("init", img);
 	//imshow("template", tImg);
 
 	CImageAnalysis ci = CImageAnalysis();
@@ -96,7 +92,7 @@ vector<Point> templateMatch(Mat img, vector<Mat> tImg, double threshold) {
 					}
 					if (!isOverlapped) {
 						templateMatchedPoints.push_back(Point(j, i));
-						rectangle(dstImg, Point(j, i), Point(j + templateImg.cols, i + templateImg.rows), Scalar(0, 0, 255), 1);
+						//rectangle(dstImg, Point(j, i), Point(j + templateImg.cols, i + templateImg.rows), Scalar(0, 0, 255), 1);
 						count++;
 					}
 				}
@@ -106,7 +102,6 @@ vector<Point> templateMatch(Mat img, vector<Mat> tImg, double threshold) {
 	cout << "Found: " << count << '\n';
 
 	//imshow("result", result);
-	imshow("final", dstImg);
 
 	return templateMatchedPoints;
 }

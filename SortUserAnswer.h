@@ -22,7 +22,7 @@ public:
 	}
 
 };
-Mat checkAnswerByNumberTemplate(Mat input, int answer[]);
+Mat checkAnswerByNumberTemplate(Mat origin, Mat input, int answer[]);
 vector<AnswerByChecked> mergeCheckedAnswer(vector<Point> checkedVector, vector<Point> uncheckedVector);
 bool compareAnswer(AnswerByChecked a, AnswerByChecked b);
 bool compareAnswer2(Point a, Point b);

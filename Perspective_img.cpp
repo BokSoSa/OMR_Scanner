@@ -5,10 +5,10 @@ using namespace std;
 
 Mat perspective_img(Mat img);
 void findAnswers(Mat img, int ansW, int ansH, double rat);
-Mat checkAnswerBySort(Mat input, int answer[]);
+Mat checkAnswerBySort(Mat origin, Mat input, int answer[]);
 vector<Rect> find_number_location(Mat image);
 void recognize_number(Mat original, vector<Rect> boundRect);
-
+Mat remove_shadow(Mat img);
 struct locate {
 	int x;
 	int y;
@@ -26,17 +26,20 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 		loc_idx++;
 		cout << "loc_idx: " << loc_idx << endl;
 		if (loc_idx == 4) {
+			Mat rmImg;
+			rmImg = remove_shadow(omrImg);
 
-			Mat crop = perspective_img(omrImg);
+			Mat cropOrigin = perspective_img(omrImg);
+			Mat crop = perspective_img(rmImg);
 
 			int correctAnswer[40] = { 2,4,3,4,1, 2,3,2,1,3,
 									2,4,4,2,1, 3,5,3,4,2,
 									2,1,1,5,4, 3,2,1,4,5,
 									1,2,1,3,4, 2,3,3,4,5};
 
-			imshow("cropped", crop);
-			checkAnswerBySort(crop, correctAnswer);
-			checkAnswerByNumberTemplate(crop, correctAnswer);
+			Mat cropOrigin2 = cropOrigin.clone();
+			checkAnswerBySort(cropOrigin, crop, correctAnswer);
+			checkAnswerByNumberTemplate(cropOrigin2, crop, correctAnswer);
 		}
 	}
 	
