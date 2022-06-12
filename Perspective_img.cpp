@@ -4,11 +4,9 @@ using namespace cv;
 using namespace std;
 
 Mat perspective_img(Mat img);
-void findAnswers(Mat img, int ansW, int ansH, double rat);
 Mat checkAnswerBySort(Mat origin, Mat input, int answer[]);
-vector<Rect> find_number_location(Mat image);
-void recognize_number(Mat original, vector<Rect> boundRect);
 Mat remove_shadow(Mat img);
+
 struct locate {
 	int x;
 	int y;
@@ -17,7 +15,6 @@ struct locate {
 locate xy[4];
 int loc_idx = 0;
 Mat omrImg;
-
 
 void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 	if (event == EVENT_LBUTTONDOWN) {
@@ -32,17 +29,23 @@ void onMouseEvent(int event, int x, int y, int flags, void* dstImg) {
 			Mat cropOrigin = perspective_img(omrImg);
 			Mat crop = perspective_img(rmImg);
 
-			int correctAnswer[40] = { 2,4,3,4,1, 2,3,2,1,3,
-									2,4,4,2,1, 3,5,3,4,2,
+			int correctAnswer[40] = { 3,4,3,2,5, 1,4,3,1,3,
+									4,5,3,1,2, 2,3,3,5,5,
 									2,1,1,5,4, 3,2,1,4,5,
-									1,2,1,3,4, 2,3,3,4,5};
+									1,2,1,1,4, 2,3,3,2,5 };
 
 			Mat cropOrigin2 = cropOrigin.clone();
+			//time_t start, end;
+			//start = clock();
 			checkAnswerBySort(cropOrigin, crop, correctAnswer);
+			//end = clock();
+			//cout << "first time : " << (double)(end - start) << endl;
+			//start = clock();
 			checkAnswerByNumberTemplate(cropOrigin2, crop, correctAnswer);
+			//end = clock();
+			//cout << "second time : " << (double)(end - start) << endl;
 		}
 	}
-	
 	return;
 }
 
@@ -82,77 +85,4 @@ Mat perspective_img(Mat img) {
 	warpPerspective(img, output, lambda, Size((xy[1].x - xy[0].x) * 2, (xy[2].y - xy[1].y) * 2));//입력,출력,변환행렬,크기
 
 	return output;
-}
-
-vector<Rect> find_number_location(Mat image) {
-	Mat drawing;
-	vector<vector<Point>> contours;
-	vector<Vec4i> hierarchy;
-	double ratio;
-	int refinery_count = 0;
-
-	cvtColor(image, image, COLOR_BGR2GRAY);
-	imshow("gray", image);
-
-	//Canny(image, image, 100, 300, 3);
-	//imshow("canny", image);
-
-	// Finding contours
-	findContours(image, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point());
-	vector<vector<Point> > contours_poly(contours.size());
-	vector<Rect> boundRect(contours.size());
-	vector<Rect> boundRect2(contours.size());
-
-	// Bind rectangle to every rectangle.
-	for (int i = 0; i < contours.size(); i++) {
-		approxPolyDP(Mat(contours[i]), contours_poly[i], 1, true);
-		boundRect[i] = boundingRect(Mat(contours_poly[i]));
-	}
-
-	drawing = Mat::zeros(image.size(), CV_8UC3);
-
-	for (int i = 0; i < contours.size(); i++) {
-
-		ratio = (double)boundRect[i].height / boundRect[i].width;
-
-		// Filtering rectangles height/width ratio, and size.
-		if (((ratio <= 3.5) && (ratio >= 0.5)) && ((boundRect[i].area() <= 500) && (boundRect[i].area() >= 70))) {
-
-			drawContours(drawing, contours, i, Scalar(0, 255, 255), 1, 8, hierarchy, 0, Point());
-			rectangle(drawing, boundRect[i].tl(), boundRect[i].br(), Scalar(255, 0, 0), 1, 8, 0);
-
-			// Include only suitable rectangles.
-			boundRect2[refinery_count] = boundRect[i];
-			refinery_count += 1;
-		}
-	}
-
-	boundRect2.resize(refinery_count);  //  Resize refinery rectangle array.
-
-	imshow("Contours&Rectangles", drawing);
-
-
-	cout << "boundRect2.size()" << boundRect2.size() << endl;
-
-	Mat drawingPoint = image;
-	for (int i = 0; i < boundRect2.size(); i++) {
-		cout << boundRect2[i] << endl;
-		//cout << "X : " << boundRect2[i].x <<", Y : " << boundRect2[i].y << endl;
-		rectangle(drawingPoint, boundRect2[i].tl(), boundRect2[i].br(), Scalar(255, 0, 0), 1, 8, 0);
-	}
-	imshow("drawingRect", drawingPoint);
-
-	return boundRect2;
-}
-
-void recognize_number(Mat original, vector<Rect> boundRect) {
-	vector<Rect> realNumber;
-
-	for (int i = 0; i < boundRect.size(); i++) {
-		cout << boundRect[i] << endl;
-		Mat number = original(boundRect[i]);
-		string name = "number" + to_string(i);
-		imshow(name, number);
-	}
-	waitKey();
 }
